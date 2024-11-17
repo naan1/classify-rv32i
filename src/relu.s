@@ -25,11 +25,26 @@
 relu:
     li t0, 1             
     blt a1, t0, error     
-    li t1, 0             
-
+    li t1, 0             # index
+    mv t2, a0                   
 loop_start:
-    # TODO: Add your own implementation
+    # Loop termination condition
+    bge t1, a1, loop_end        # If index >= size, exit loop
+    lw t3, 0(t2)                # Load element value into t3
+    blt t3, zero, set_zero      # If value < 0, go to set_zero
+    j loop_continue             # Otherwise, skip to next element
+
+set_zero:
+    sw zero, 0(t2)              # Set element to 0 if it was negative
+
+loop_continue:
+    addi t1, t1, 1              # Increment index
+    addi t2, t2, 4
+    j loop_start                # Repeat loop
+     
 
 error:
     li a0, 36          
     j exit          
+loop_end :
+   jr ra

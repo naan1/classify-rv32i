@@ -167,6 +167,18 @@ classify:
     lw t0, 0(s3)
     lw t1, 0(s8)
     # mul a0, t0, t1 # FIXME: Replace 'mul' with your own implementation
+    li      a0, 0           # result = 0
+multiply_loop1:
+    beqz    t1, end_multiply_loop1 # If multiplier is zero, end multiplication
+    andi    t2, t1, 1             # Check if LSB of multiplier is 1
+    beqz    t2, skip_add_a1
+    add     a0, a0, t0            # result += multiplicand
+skip_add_a1:
+    slli    t0, t0, 1             # multiplicand <<= 1
+    srli    t1, t1, 1             # multiplier >>= 1
+    j       multiply_loop1
+end_multiply_loop1:
+
     slli a0, a0, 2
     jal malloc 
     beq a0, x0, error_malloc
@@ -205,6 +217,18 @@ classify:
     lw t1, 0(s8)
     # mul a1, t0, t1 # length of h array and set it as second argument
     # FIXME: Replace 'mul' with your own implementation
+    li      a1, 0           # result = 0
+multiply_loop2:
+    beqz    t1, end_multiply_loop2 # If multiplier is zero, end multiplication
+    andi    t2, t1, 1             # Check if LSB of multiplier is 1
+    beqz    t2, skip_add_a2
+    add     a1, a1, t0            # result += multiplicand
+skip_add_a2:
+    slli    t0, t0, 1             # multiplicand <<= 1
+    srli    t1, t1, 1             # multiplier >>= 1
+    j       multiply_loop2
+end_multiply_loop2:
+
     
     jal relu
     
@@ -227,6 +251,20 @@ classify:
     lw t0, 0(s3)
     lw t1, 0(s6)
     # mul a0, t0, t1 # FIXME: Replace 'mul' with your own implementation
+    li      a0, 0           # result = 0
+multiply_loop3:
+    beqz    t1, end_multiply_loop3 # If multiplier is zero, end multiplication
+    andi    t2, t1, 1             # Check if LSB of multiplier is 1
+    beqz    t2, skip_add_a3
+    add     a0, a0, t0            # result += multiplicand
+skip_add_a3:
+    slli    t0, t0, 1             # multiplicand <<= 1
+    srli    t1, t1, 1             # multiplier >>= 1
+    j       multiply_loop3
+end_multiply_loop3:
+
+    
+    
     slli a0, a0, 2
     jal malloc 
     beq a0, x0, error_malloc
@@ -288,6 +326,18 @@ classify:
     lw t1, 0(s6)
     mul a1, t0, t1 # load length of array into second arg
     # FIXME: Replace 'mul' with your own implementation
+    li      a1, 0           # result = 0
+multiply_loop4:
+    beqz    t1, end_multiply_loop4 # If multiplier is zero, end multiplication
+    andi    t2, t1, 1             # Check if LSB of multiplier is 1
+    beqz    t2, skip_add_a4
+    add     a1, a1, t0            # result += multiplicand
+skip_add_a4:
+    slli    t0, t0, 1             # multiplicand <<= 1
+    srli    t1, t1, 1             # multiplier >>= 1
+    j       multiply_loop4
+end_multiply_loop4:
+
     
     jal argmax
     

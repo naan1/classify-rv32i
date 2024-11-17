@@ -116,6 +116,37 @@ inner_loop_start:
     
 inner_loop_end:
     # TODO: Add your own implementation
+    addi    s0, s0, 1
+    mv      t3, a2          # multiplicand = cols0
+    mv      t4, s0
+    li      t5, 0           # result = 0
+
+multiply_loop:
+    beqz    t3, end_multiply_loop # If multiplier is zero, end multiplication
+    andi    t0, t3, 1                 # Check if LSB of multiplier is 1
+    beqz    t0, skip_add_a
+    add     t5, t5, t4                # result += multiplicand
+skip_add_a:
+    slli    t4, t4, 1                 # multiplicand <<= 1
+    srli    t3, t3, 1                 # multiplier >>= 1
+    j       multiply_loop
+end_multiply_loop:
+    
+    slli t5,t5,2
+    add s3, a0, t5
+    j outer_loop_start
+
+outer_loop_end:
+    # Epilogue: Restore saved registers and return
+    lw  ra, 0(sp)         # Restore return address
+    lw  s0, 4(sp)         # Restore s0
+    lw  s1, 8(sp)         # Restore s1
+    lw  s2, 12(sp)        # Restore s2
+    lw  s3, 16(sp)        # Restore s3
+    lw  s4, 20(sp)        # Restore s4
+    lw  s5, 24(sp)        # Restore s5
+    addi  sp, sp, 28        # Restore stack pointer
+    jr  ra                # Return to caller
 
 error:
     li a0, 38

@@ -34,8 +34,8 @@
 # Memory Note:
 #   Caller is responsible for freeing returned matrix pointer
 # ==============================================================================
+
 read_matrix:
-    
     # Prologue
     addi sp, sp, -40
     sw ra, 0(sp)
@@ -57,7 +57,7 @@ read_matrix:
 
     mv s0, a0        # file
 
-    # read rows n columns
+    # read rows and cols
     mv a0, s0
     addi a1, sp, 28  # a1 is a buffer
 
@@ -74,13 +74,19 @@ read_matrix:
     sw t1, 0(s3)     # saves num rows
     sw t2, 0(s4)     # saves num cols
 
-    # mul s1, t1, t2   # s1 is number of elements
-    # FIXME: Replace 'mul' with your own implementation
+    # Replace 'mul' with manual multiplication
+    li s1, 0         # Initialize result to 0
+mul_loop:
+    beqz t2, mul_done # If t2 == 0, multiplication is complete
+    add s1, s1, t1    # Add t1 (rows) to result
+    addi t2, t2, -1   # Decrement t2 (cols)
+    j mul_loop        # Repeat loop
+mul_done:
 
-    slli t3, s1, 2
-    sw t3, 24(sp)    # size in bytes
+    slli t3, s1, 2    # t3 = s1 * 4 (size in bytes)
+    sw t3, 24(sp)     # size in bytes
 
-    lw a0, 24(sp)    # a0 = size in bytes
+    lw a0, 24(sp)     # a0 = size in bytes
 
     jal malloc
 
@@ -143,3 +149,4 @@ error_exit:
     lw s4, 20(sp)
     addi sp, sp, 40
     j exit
+
