@@ -1,7 +1,7 @@
 # Assignment 2: Classify
 ## function  
 ## Part A      
-### Task 1: Absolute Value 
+### Task : Absolute Value 
 this part is a walkthrough to make sure the value is positive
 ```asm
 # ...
@@ -13,14 +13,14 @@ sw   t0 0(a0)
 
 
 
-### Task 2: ReLU        
+### Task 1: ReLU        
 #### Conceptual Overview: ReLU
 > ReLU (Rectified Linear Unit) is an activation function used in neural networks.
 > It outputs the input directly if it is positive, otherwise returns zero.
 > mathematical formula:
 $\text{ReLU}(x) = \max(0, x)$
 
-#### code   
+#### Code   
 ```assembly
 .globl relu
 
@@ -59,12 +59,12 @@ loop_continue:
 
 ---
 
-### Task 3: Argmax         
+### Task 2: Argmax         
 
 #### Conceptual Overview: Argmax  
 >The Argmax function finds the index of the maximum value in an array. If there are multiple maximum values, it returns the index of the first occurrence. This is particularly useful in applications like classification problems where the position of the highest probability (argmax) indicates the predicted class.
 
-#### code  
+#### Code  
 ```assembly
 #....
 #....
@@ -121,11 +121,11 @@ finish:
    Stores the index of the maximum value in `a0` and exits via `ret`.
 ---
 
-### Task 4: Dot Product
+### Task 3.1: Dot Product
 #### Conceptual Overview: Dot Product  
 >The dot product is a mathematical operation that multiplies corresponding elements of two arrays and sums the results. This function calculates the dot product with a stride, meaning it skips elements in each array by a specified number of positions (stride0 and stride1) during the computation.
 
-#### code  
+#### Code  
 ```assembly
 #...
 #...
@@ -185,21 +185,127 @@ multiply_end:
 - Stride Addition (`add t2, t2, a3`, `add t3, t3, a4`)
 - Loop Counter Increment (`addi t1, t1, 1`)
 
+
+
 --- 
+### Task 3.2: Matrix Multiplication
+#### Conceptual Overview: Matrix Multiplication
+>The matrix multiplication function computes the resulting matrix C (with dimensions n×k) from two input matrices A (dimensions n×m) and B (dimensions m×k).
+#### Code
+```asm
+#...
+#...
+inner_loop_end:
+    # TODO: Add your own implementation
+    addi    s0, s0, 1
+    mv      t3, a2          # multiplicand = cols0
+    mv      t4, s0
+    li      t5, 0           # result = 0
+
+multiply_loop:
+    beqz    t3, end_multiply_loop 
+    andi    t0, t3, 1                 
+    beqz    t0, skip_add_a
+    add     t5, t5, t4              
+skip_add_a:
+    slli    t4, t4, 1                 
+    srli    t3, t3, 1                 
+    j       multiply_loop
+end_multiply_loop:
+    
+    slli t5,t5,2
+    add s3, a0, t5
+    j outer_loop_start
+
+outer_loop_end:
+    lw  ra, 0(sp)         
+    lw  s0, 4(sp)         
+    lw  s1, 8(sp)         
+    lw  s2, 12(sp)        
+    lw  s3, 16(sp)      
+    lw  s4, 20(sp)        
+    lw  s5, 24(sp)        
+    addi  sp, sp, 28        
+    jr  ra                
+#...
+#...
+```
+
 --- 
 
 ## Part B
 ### Task 1: Read Matrix
-#### code 
+>This section replaces the mul instruction with a loop-based implementation that calculates the product of t1 (rows) and t2 (columns)
+#### Code 
+```asm
+#...
+#...
+# mul s1, t1, t2   # s1 is number of elements
+# FIXME: Replace 'mul' with your own implementation
+    li      s1, 0 
+multiply_loop:
+    beqz    t2, mul_done  
+    andi    t0, t2, 1          
+    beqz    t0, skip_add       
+    add     s1, s1, t1         
+skip_add:
+    slli    t1, t1, 1          
+    srli    t2, t2, 1          
+    j       multiply_loop      
+
+mul_done:
+#...
+#...
+#...
+```
+* Because most of code were done by instructor, thus, use the same way to replace instruction of `mul` as we applied on part a.
 
 ### Task 2: Write Matrix
-#### code 
+#### Code 
+```asm
+    li      s4, 0           # Initialize result s4 = 0
+mul_loop:
+    beqz    s3, mul_done     # If multiplier (s3) is 0, multiplication is complete
+    andi    t0, s3, 1        # Check if LSB of multiplier is 1
+    beqz    t0, skip_add     # If LSB is 0, skip addition
+    add     s4, s4, s2       # s4 += multiplicand (s2)
+skip_add:
+    slli    s2, s2, 1        # multiplicand <<= 1 (shift left)
+    srli    s3, s3, 1        # multiplier >>= 1 (shift right)
+    j       mul_loop         # Repeat loop
+mul_done:
+```
+* Because most of code were done by instructor, thus, use the same way to replace instruction of `mul` as we applied on part a.
 
 ### Task 3: Classification
-#### code 
+#### Code 
+```asm
+#....
+#....
+#....
+    # mul a0, t0, t1 # FIXME: Replace 'mul' with your own implementation
+    li      a0, 0           # result = 0
+multiply_loop1:
+    beqz    t1, end_multiply_loop1 # If multiplier is zero, end multiplication
+    andi    t2, t1, 1             # Check if LSB of multiplier is 1
+    beqz    t2, skip_add_a1
+    add     a0, a0, t0            # result += multiplicand
+skip_add_a1:
+    slli    t0, t0, 1             # multiplicand <<= 1
+    srli    t1, t1, 1             # multiplier >>= 1
+    j       multiply_loop1
+end_multiply_loop1:
+#....
+#....
+#....
+#....
+#....
+#....
+```
+* Because most of code were done by instructor, thus, use the same way to replace instruction of `mul` as we applied on part a.
+* There are 4 `mul` need to fix.
 
----
 --- 
 
-## result of test all 
+## Result of test all 
 
