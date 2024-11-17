@@ -3,7 +3,7 @@
 ## Part A      
 ### Task 1: Absolute Value 
 this part is a walkthrough to make sure the value is positive
-``` = c
+``` c =
 # ...
 sub  t0, x0, t0
 sw t0 0(a0)
